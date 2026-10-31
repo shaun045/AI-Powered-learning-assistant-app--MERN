@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage'
 import NotFoundPage from './pages/NotFoundPage.jsx'
-import ProtectedRoute from './pages/Auth/ProtectedRoute'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 import DashboardPage from './pages/Dashboard/DashboardPage.jsx';
 import DocumentListPage from './pages/Documents/DocumentListPage.jsx'
 import DocumentDetailPage from './pages/Documents/DocumentDetailPage'
