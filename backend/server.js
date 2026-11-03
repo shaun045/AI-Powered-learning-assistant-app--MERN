@@ -5,6 +5,7 @@ import express from 'express'
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import errorHandler from '../middleware/errorHandler.js'
 
 //ES6 Module_dirname alternative
 const __filename = fileURLToPath(import.meta.url);
@@ -28,3 +29,33 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
+
+// Static folder for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+//Routes
+app.use(errorHandler);
+
+//404 Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Route not found",
+    statusCode: 404
+  });
+});
+
+
+//Start server
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});
+
+
+process.on('unhandledRejection', (err) => {
+  console.error(`Error: ${err.message}`);
+  process.exit(1);
+});
