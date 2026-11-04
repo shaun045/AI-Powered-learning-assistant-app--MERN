@@ -5,7 +5,8 @@ import express from 'express'
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import errorHandler from '../middleware/errorHandler.js'
+import connerDB from './config/debugger.js'
+import errorHandler from './middleware/errorHandler.js'
 
 //ES6 Module_dirname alternative
 const __filename = fileURLToPath(import.meta.url);
