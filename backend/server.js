@@ -5,7 +5,7 @@ import express from 'express'
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import connerDB from './config/debugger.js'
+import connectDB from './config/db.js'
 import errorHandler from './middleware/errorHandler.js'
 
 //ES6 Module_dirname alternative
@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 //Connect to MongoDB
-connectBD();
+connectDB();
 
 //Middleware to handle CORS
 app.use(
