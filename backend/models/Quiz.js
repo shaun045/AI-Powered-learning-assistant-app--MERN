@@ -57,7 +57,19 @@ const quizSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
-  }]
-
-  
-})
+  }],
+  score: {
+    type: Number,
+    default: 0
+  },
+  totalQuestions: {
+    type: Number,
+    required: true
+  },
+  completedAt: {
+    type: Date,
+    default: null
+  }
+}, {
+  timestamps:true
+});
