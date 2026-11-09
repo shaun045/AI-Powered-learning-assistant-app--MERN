@@ -27,5 +27,18 @@ const documentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  
+  chunks: [{
+    content: {
+      type: String,
+      required: true
+    },
+    pageNumbers: {
+      type: Number,
+      default: 0
+    }, 
+    chunkIndex: {
+      type: Number,
+      required: true
+    }
+  }]
 })
