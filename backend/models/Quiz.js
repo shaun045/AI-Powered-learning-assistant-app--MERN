@@ -40,7 +40,24 @@ const quizSchema = new mongoose.Schema({
       default: 'medium'
     }
   }],
-
+  userAnswers: [{
+    questionIndex: {
+      type: Number,
+      required: true
+    },
+    selectedAnswer: {
+      type: String,
+      required: true
+    },
+    isCorrect: {
+      type: Boolean,
+      required: true
+    },
+    answeredAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 
   
 })
