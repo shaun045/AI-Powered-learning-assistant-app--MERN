@@ -33,3 +33,11 @@ const chatHistorySchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+
+//Index for faster queries
+chatHistorySchema.index({userId: 1, documentId: 1});
+
+const chatHistory = mongoose.model('chatHistory', chatHistorySchema);
+
+export default chatHistory;
