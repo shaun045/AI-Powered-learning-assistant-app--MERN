@@ -88,7 +88,31 @@ export const login = async (req, res, next) => {
       });
     }
 
-    
+    //Check password
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid Credentials",
+        statusCode: 401,
+      });
+    }
+
+    //Generate token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage,
+      },
+      token,
+      message: "Login successful",
+    });
   } catch (error) {
     next(error);
   }
