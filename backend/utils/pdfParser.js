@@ -23,4 +23,4 @@ export const extractTextFromPDF = async (filePath) => {
     throw new Error("Failed to extract text from PDF");
   }
 
-}
+};
