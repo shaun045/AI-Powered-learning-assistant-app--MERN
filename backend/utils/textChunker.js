@@ -78,4 +78,29 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
       currentWordCount += paragraphWordCount;
     }
   }
+
+  // Add the last chunk
+  if (currentChunk.length > 0) {
+    chunks.push({
+      content: currentChunk.join('\n\n'),
+      chunkIndex: chunkIndex,
+      pageNumber: 0
+    });
+  }
+
+  //Fallback: if no chunks created, split by words
+  if (chunks.length === 0 && cleanedText.length > 0) {
+    const allWords = cleanedText.split(/\s+/);
+    for (let i = 0; i < allWords.length; i += (chunkSize - overlap)) {
+      const chunkWords = allWords.slice(i, i + chunkSize);
+      chunks.push({
+        content: chunkWords.join(' '),
+        chunkIndex: chunkIndex++,
+        pageNumber: 0
+      });
+
+      if (i + chunkSize >= allWords.length) break;
+    }
+  }
+  return chunks;
 };
