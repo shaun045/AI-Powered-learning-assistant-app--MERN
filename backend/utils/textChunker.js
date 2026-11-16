@@ -56,5 +56,26 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
 
       continue;
     }
+
+    // If adding this paragraph exceeds chunk size, save current chunk
+    if (currentWordCount + paragraphWordCount > chunkSize && currentChunk.length > 0) {
+      chunks.push({
+        content: currentChunk.join('\n\n'),
+        chunkIndex: chunkIndex++,
+        pageNumber: 0
+      });
+
+      //Create overlap from previous chunk
+      const prevChunkText = currentChunk.join(' ');
+      const prevWords = prevChunkText.split(/\s+/);
+      const overlapText = prevWords.slice(-Math.min(overlap, prevWords.length)).join(' ');
+
+      currentChunk = [overlapText, paragraph.trim()];
+      currentWordCount = overlapText.split(/\s+/).length + paragraphWordCount;
+    } else {
+      // Add paragraph to current chunk
+      currentChunk.push(paragraph.trim());
+      currentWordCount += paragraphWordCount;
+    }
   }
 };
