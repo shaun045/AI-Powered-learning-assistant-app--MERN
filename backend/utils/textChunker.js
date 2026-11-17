@@ -104,3 +104,38 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
   }
   return chunks;
 };
+
+/**
+ * Find relevant chunks based on keyword matching
+ * @param {Array<Object>} chunks - Array of chunks
+ * @param {string} query - Search query
+ * @param {number} maxChunks - Maximum chunks to return
+ * @returns {Array<Object>}
+ */
+
+export const findRelevantChunks = (chunks, query, maxChunks = 3) => {
+  if (!chunks || chunks.length === 0 || !query) {
+    return [];
+  }
+
+  // Common stop words to exclude
+  const stopWords = new Set ([
+    'the', 'is', 'at', 'which', 'on', 'a', 'an', 'and', 'or', 'but', 'in', 'with', 'to', 'for', 'of', 'as', 'by', 'this', 'that', 'it'
+  ]);
+
+  // Extract and clean query words
+  const queryWords = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !stopWords.has(w));
+
+  if (queryWords.length === 0) {
+    //Return clean chunk objects without Mongoose metadata
+    return chunks.slice(0, maxChunks).map(chunk => ({
+      content: chunk.content,
+      chunkIndex: chunk.chunkIndex,
+      pageNumber: chunk.pageNumber,
+      _id: chunk._id
+    }));
+  }
+}
