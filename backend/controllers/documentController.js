@@ -11,7 +11,50 @@ import mongoose from 'mongoose';
 // @access Private
 export const uploadDocument = async (req, res, next) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please upload a PDF file',
+        statusCode: 400
+      });
+    }
 
+    const { title } = req.body;
+
+    if (!title) {
+      //Delete uploaded file if no title provided
+      await fs.unlink(req.file.path);
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide a document title',
+        statusCode: 400
+      });
+    }
+
+    //Construct the URL for the uploaded file
+    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
+    const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+
+    //Create document record
+    const document = await Document.create({
+      userId: req.user._id,
+      title,
+      fileName: req.file.originalname,
+      filePath: fileUrl, //Store the URL instead of the local path
+      fileSize: req.file.size,
+      status: 'processing'
+    });
+
+    //Process PDF in background (in production, use a queue like Bull)
+    processPDF(document._id, req.file.path).catch(err => {
+      console.error('PDF processing error:', err);
+    });
+
+    res.status(201).json({
+      success: true,
+      data: document,
+      message: 'Document upload successfully, Processing in progress...'
+    });
   } catch (error) {
     // Clean up file on error
     if (req.file) {
@@ -21,30 +64,47 @@ export const uploadDocument = async (req, res, next) => {
   }
 };
 
+
 // @desc Get all user documents
 // @route GET /api/documents
 // @access Private
 export const getDocuments = async (req, res, next) => {
-
+  try {
+    
+  } catch (error) {
+    next(error);
+  }
 };
 
 // @desc Get single document with chunks
 // @route Get /api/documents/:id
 // @access Private
 export const getDocument = async (req, res, next) => {
-
+  try {
+    
+  } catch (error) {
+    next(error);
+  }
 };
 
 // @desc Delete document
 // @route DELETE /api/documents/:id
 // @access Private
 export const deleteDocument = async (req, res, next) => {
-
+  try {
+    
+  } catch (error) {
+    next(error);
+  }
 };
 
 // @desc Update document title
 // @route PUT /api/documents/:id
 // @access Private
 export const updateDocument = async (req, res, next) => {
-
+  try {
+    
+  } catch (error) {
+    next(error);
+  }
 };
