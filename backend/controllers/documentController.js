@@ -64,6 +64,31 @@ export const uploadDocument = async (req, res, next) => {
   }
 };
 
+//Helper function
+const processPDF = async (documentId, filePath) => {
+  try {
+    const { text } = await extractTextFromPDF(filePath);
+
+    //Create chunks
+    const chunks = chunkText( text, 500, 50);
+
+    //Update document
+    await Document.findByIdAndUpdate(documentId, {
+      extractText: text,
+      chunks: chunks,
+      status: 'ready'
+    });
+
+    console.log(`Document ${documentId} processed successfully`);
+  } catch (error) {
+    console.error(`Error processing document ${documentId}:`, error);
+
+    await Document.findByIdAndUpdate(documentId, {
+      status: 'failed'
+    });
+  }
+}
+
 
 // @desc Get all user documents
 // @route GET /api/documents
