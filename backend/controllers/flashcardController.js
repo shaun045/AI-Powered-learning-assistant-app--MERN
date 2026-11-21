@@ -5,7 +5,18 @@ import Flashcard from "../models/Flashcard.js";
 // @access Private
 export const getFlashcards = async (req, res, next) => {
   try {
+    const flashcards = await Flashcard.find({
+      userId: req.user._id,
+      documentId: req.params.documentId
+    })
+      .populate('documentId', 'title fileName')
+      .sort({ createdAt: -1 });
     
+      res.status(200).json({
+        success: true,
+        count: flashcards.length,
+        data: flashcards
+      });
   } catch (error) {
     next(error);
   }
