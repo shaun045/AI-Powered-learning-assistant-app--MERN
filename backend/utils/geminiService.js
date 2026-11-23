@@ -70,3 +70,72 @@ export const generateFlashcards = async (text, count = 10) => {
     throw new Error('Failed to generate flashcards');
   }
 };
+
+/**
+ * Generate quiz questions
+ * @param {string} text - Document text
+ * @param {number} numQuestions - Number of questions
+ * @returns {Promise<Array<{question: string, option: Array, correctAnswer: string, explanation: string, difficulty}>>}
+ */
+export const generateQuiz = async (text, numQuestions = 5) => {
+  const prompt = `Generate exactly ${numQuestions} multiple choice questions from the following text.
+  Format each question as:
+  Q: [Question]
+  O1: [Option 1]
+  O2: [Option 2]
+  O3: [Option 3]
+  O4: [Option 4]
+  C: [Correct option - exactly as written above]
+  E: [Brief explanation]
+  D: [Difficulty: easy, medium, or hard]
+
+  Separate questions with "---"
+
+  Text: 
+  ${text.substring(0, 15000)}
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+    });
+
+    const generatedText = response.text;
+
+    const questions = [];
+    const questionBlocks = generatedText.split('---').filter(q => q.trim());
+
+    for (const block of questionBlocks) {
+      const lines = block.trim().split('\n');
+      let question = '', options = [], correctAnswer = '', explanation = '', difficulty = 'medium';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('Q:')) {
+          question = trimmed.substring(2).trim();
+        } else if (trimmed.match(/^O\d:/)) {
+          options.push(trimmed.substring(3).trim());
+        } else if (trimmed.startsWith('C:')) {
+          correctAnswer = trimmed.substring(2).trim();
+        } else if (trimmed.startsWith('E:')) {
+          explanation = trimmed.substring(2).trim();
+        } else if (trimmed.startsWith('D:')) {
+          const diff = trimmed.substring(2).trim().toLowerCase();
+          if (['easy', 'medium', 'hard'].includes(diff)) {
+            difficulty = diff;
+          }
+        }
+      }
+
+      if (question && options.length === 4 && correctAnswer) {
+        questions.push({ question, options, correctAnswer, explanation, difficulty });
+      }
+    }
+
+    return questions.slice(0, numQuestions);
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    throw new Error('Failed to generate quiz');
+  }
+};
