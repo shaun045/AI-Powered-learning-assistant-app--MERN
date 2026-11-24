@@ -195,3 +195,30 @@ export const chatWithContext = async (question, chunks) => {
     throw new Error('Failed to process chat request');
   }
 };
+
+/**
+ * Explain a specific concept
+ * @param {string} concept - Concept to explain
+ * @param {string} context - Relevant context
+ * @returns {Promise<string>}
+ */
+export const explainConcept = async (concept, context) => {
+  const prompt = `Explain the concept of "${concept}" based on the following context.
+  Provide a clear, educational explanation that's easy to understand.
+  Include examples if relevant.
+
+  Context:
+  ${context.substring(0, 10000)}`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+    });
+    const generatedText = response.text;
+    return generatedText
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    throw new Error('Failed to explain concept');
+  }
+}
