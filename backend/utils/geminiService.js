@@ -164,3 +164,34 @@ export const generateSummary = async (text) => {
   }
 };
 
+/**
+ * Chat with document context
+ * @param {string} question - User question
+ * @param {Array<Object>} chunks - Relevant document chunks
+ * @returns {Promise<String>}
+ */
+export const chatWithContext = async (question, chunks) => {
+  const context = chunks.map((c, i) => `[Chunk ${i + 1}]\n${c.content}`).join('\n\n');
+
+
+  const prompt = `Based on the following context from a document, Analyse the context and answer the user's question. If the answer is not in the context, say so.
+  
+  Context:
+  ${context}
+
+  Question: ${question}
+
+  Answer:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+    });
+    const generatedText = response.text;
+    return generatedText
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    throw new Error('Failed to process chat request');
+  }
+};
