@@ -90,7 +90,7 @@ export const reviewFlashcard = async(req, res, next) => {
 // @desc Toggle star/favorite on flashcard
 // @route PUT /api/flashcards/:cardId/star
 // @access Private
-export const toggleStarFLashcard = async (req, res, next) => {
+export const toggleStarFlashcard = async (req, res, next) => {
   try {
     const flashcardSet = await Flashcard.findOne({
       'cards._id': req.params.cardId,
