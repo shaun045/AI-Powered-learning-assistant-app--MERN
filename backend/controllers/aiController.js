@@ -67,14 +67,67 @@ export const generateFlashcards = async (req, res, next) => {
 // @route POST /api/ai/generate-quiz
 // @access Private
 export const generateQuiz = async (req, res, next) => {
+  try {
+    const { documentId, numQuestions = 5, title } = req.body;
 
+    if (!documentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide documentId',
+        statusCode: 400
+      });
+    }
+
+    const document = await Document.findOne({
+      _id: documentId,
+      userId: req.user._id,
+      status: 'ready'
+    });
+
+    if (!document) {
+      return res.status(400).json({
+        success: false,
+        error: 'Document not found or not ready',
+        statusCode: 404
+      });
+    }
+
+    // Generate quiz using Gemini
+    const questions = await geminiService.generateQuiz(
+      document.extractedText,
+      parseInt(numQuestions)
+    )
+
+    // Save to database
+    const quiz = await Quiz.create({
+      userId: req.user._id,
+      documentId: document._id,
+      title: title || `${document.title} - Quiz`,
+      questions: questions,
+      totalQuestions: questions.length,
+      userAnswers: [],
+      score: 0
+    });
+
+    res.status(201).json({
+      success: true,
+      data: quiz,
+      message: 'Quiz generated successfully'
+    });
+  } catch (error) {
+    next(error)
+  }
 };
 
 // @desc Generate document summary
 // @route POST /api/ai/generate-summary
 // @access Private
 export const generateSummary = async (req, res, next) => {
+  try {
 
+  } catch (error) {
+    next(error)
+  }
 };
 
 
@@ -82,7 +135,11 @@ export const generateSummary = async (req, res, next) => {
 // @route POST /api/ai/chat
 // @access Private
 export const chat = async (req, res, next) => {
+  try {
 
+  } catch (error) {
+    next(error)
+  }
 };
 
 
@@ -90,12 +147,20 @@ export const chat = async (req, res, next) => {
 // @route POST /api/ai/explain-concept
 // @access Private
 export const explainConcept = async (req, res, next) => {
+  try {
 
+  } catch (error) {
+    next(error)
+  }
 };
 
 // @desc Get chat history for a document
 // @route POST /api/ai/chat-history/:documentId
 // @access Private
 export const getChatHistory = async (req, res, next) => {
+  try {
 
+  } catch (error) {
+    next(error)
+  }
 };
