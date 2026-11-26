@@ -5,6 +5,7 @@ import ChatHistory from '../models/ChatHistory.js';
 import * as geminiService from '../utils/geminiService.js';
 import { findRelevantChunks } from '../utils/textChunker.js';
 import chatHistory from '../models/ChatHistory.js';
+import chatHistory from '../models/ChatHistory.js';
 
 // @desc Generate flashcards from document
 // @route POST /api/ai/generate-flashcards
@@ -266,7 +267,7 @@ export const explainConcept = async (req, res, next) => {
       });
     }
 
-    const documennt = await Document.findOne({
+    const document = await Document.findOne({
       _id: documentId,
       userId: req.user._id,
       status: 'ready'
@@ -306,7 +307,34 @@ export const explainConcept = async (req, res, next) => {
 // @access Private
 export const getChatHistory = async (req, res, next) => {
   try {
+    const {documentId} = req.params;
 
+    if (!documentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide documentId',
+        statusCode: 400
+      });
+    }
+
+    const chatHistory = await chatHistory.findOne({
+      userId: req.user._id,
+      documentId: documentId
+    }).select('message'); // Only retrieve the messages array
+
+    if (!chatHistory) {
+      return res.status(200).json({
+        success: true,
+        data: [], // Return an empty array if no chat history found
+        message: 'No chat history found for this document'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: chatHistory.messages,
+      message: 'Chat history retrieved successfully'
+    });
   } catch (error) {
     next(error)
   }
