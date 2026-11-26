@@ -256,7 +256,46 @@ export const chat = async (req, res, next) => {
 // @access Private
 export const explainConcept = async (req, res, next) => {
   try {
+    const { documentId, concept } = req.body;
 
+    if (!documentId || !concept) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide documentId and concept',
+        statusCode: 400
+      });
+    }
+
+    const documennt = await Document.findOne({
+      _id: documentId,
+      userId: req.user._id,
+      status: 'ready'
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        error: 'Document not found or not ready',
+        statusCode: 404
+      });
+    }
+
+    // Find relevant chunks for the concept
+    const relevantChunks = findRelevantChunks(document.chunks, concept, 3);
+    const context = relevantChunks.map(c => c.content).join('\n\n');
+
+    // Generate explanation using Gemini
+    const explanation = await geminiService.explainConcept(concept, context);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        concept,
+        explanation,
+        relevantChunks: relevantChunks.map(c => c.chunkIndex)
+      },
+      message: 'Explanation generated successfully'
+    });
   } catch (error) {
     next(error)
   }
